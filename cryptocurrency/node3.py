@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 class Blockchain:
     
     def __init__(self):
-        print('Cryptocurrency application runs')
+        print('Bogdan Cryptocurrency application runs on port 5003')
         self.chain = []
         self.transactions = []
         self.create_block(proof = 1, previous_hash = '0')
@@ -92,6 +92,7 @@ class Blockchain:
 
     def add_node(self, address):
         parsed_url = urlparse(address)
+        print(f'Add node: {parsed_url} to the Blockchain Nodes Set')
         self.nodes.add(parsed_url.netloc)
         
         
@@ -132,7 +133,7 @@ def mine_block():
     previous_proof = previous_block['proof']
     proof = blockchain.proof_of_work(previous_proof)
     previous_hash = blockchain.hash(previous_block)
-    blockchain.add_transaction(sender=node_address, receiver='Tomasz', amount=12)
+    blockchain.add_transaction(sender=node_address, receiver='Bogdan', amount=5)
     block = blockchain.create_block(proof, previous_hash)
     
     print(f'A new block has been mined. Transaction have been added.')
@@ -186,13 +187,16 @@ def add_transaction():
 # Connecting new nodes
 @app.route('/connect_node', methods = ['POST'])
 def connect_node():
-    nodes = request.get_json()
+    json = request.get_json()
+    nodes = json.get('nodes')
+    print(f'Connect Node function starts. Json = {json}, Nodes = {nodes}')
     if nodes is None:
         return 'No node found', 400
     for node in nodes:
         blockchain.add_node(node)
     response = {'message': 'All the nodes are now connected. The Crepecoin Blockchain contains the following nodes: ',
                 'total_nodes': list(blockchain.nodes)}
+    print(f'Connect Node function Complete. {blockchain.nodes}. {len(blockchain.nodes)} nodes found.')
     return jsonify(response), 201
 
 # Replacing our chain by the longest chain if such a chain exists
@@ -210,4 +214,4 @@ def replace_chain():
 
 
 # Run the application
-app.run(host = '0.0.0.0', port = 5000)
+app.run(host = '0.0.0.0', port = 5003)
